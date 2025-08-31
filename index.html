@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Links Collection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('images/background/background.png') center center;
+            background-size: cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Noise filter overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('images/filter/noise.png') repeat;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid rgb(184, 58, 45);
+            text-transform: capitalize;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .links-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .links-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .links-list::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+
+        .links-list::-webkit-scrollbar-thumb {
+            background: rgb(184, 58, 45);
+            border-radius: 4px;
+        }
+
+        .links-list::-webkit-scrollbar-thumb:hover {
+            background: rgb(78, 104, 81);
+        }
+
+        .link-item {
+            margin-bottom: 12px;
+        }
+
+        .link-item a {
+            display: block;
+            padding: 12px 15px;
+            background: linear-gradient(135deg, rgb(184, 58, 45) 0%, rgb(78, 104, 81) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-item a:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, rgb(78, 104, 81) 0%, rgb(184, 58, 45) 100%);
+        }
+
+        .link-item a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .link-item a:hover::before {
+            left: 100%;
+        }
+
+        .link-domain {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 3px;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transform: scale(1.02);
+        }
+
+        .category-count {
+            background: rgb(184, 58, 45);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .categories-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .category-card {
+                padding: 20px;
+            }
+
+            .category-icon {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 50px;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 50px;
+        }
+
+        .error {
+            text-align: center;
+            color: #ff6b6b;
+            font-size: 1.2rem;
+            margin-top: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .fallback-data {
+            display: none;
+        }
+
+        /* Add/Delete functionality */
+        .link-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .action-btn {
+            background: rgb(78, 104, 81);
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: rgb(184, 58, 45);
+        }
+
+        .delete-btn {
+            background: rgb(184, 58, 45);
+        }
+
+        .delete-btn:hover {
+            background: rgb(78, 104, 81);
+        }
+
+        .add-link-btn {
+            background: rgb(78, 104, 81);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .add-link-btn:hover {
+            background: rgb(184, 58, 45);
+            transform: translateY(-2px);
+        }
+
+        /* Link preview tooltip */
+        .link-preview {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            max-width: 300px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .link-preview.show {
+            opacity: 1;
+        }
+
+        .preview-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .preview-description {
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: rgb(78, 104, 81);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #ccc;
+            color: #333;
+        }
+
+        /* Selection mode styles */
+        .selection-mode .link-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .selection-mode .link-item:hover {
+            background: rgba(184, 58, 45, 0.1);
+        }
+
+        .link-item.selected {
+            background: rgba(184, 58, 45, 0.2) !important;
+            border: 2px solid rgb(184, 58, 45);
+        }
+
+        .delete-mode-btn {
+            background: rgb(184, 58, 45);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .delete-mode-btn:hover {
+            background: rgb(78, 104, 81);
+            transform: translateY(-2px);
+        }
+
+        .delete-mode-btn.active {
+            background: rgb(78, 104, 81);
+        }
+
+        .delete-selected-btn {
+            background: rgb(184, 58, 45);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .delete-selected-btn:hover {
+            background: rgb(78, 104, 81);
+            transform: translateY(-2px);
+        }
+
+        .delete-selected-btn.show {
+            display: inline-block;
+        }
+
+        .manage-categories-btn {
+            background: rgb(78, 104, 81);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .manage-categories-btn:hover {
+            background: rgb(184, 58, 45);
+            transform: translateY(-2px);
+        }
+
+        /* Category management modal */
+        .category-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .category-modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .category-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .category-option {
+            flex: 1;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .category-option:hover {
+            border-color: rgb(78, 104, 81);
+            background: rgba(78, 104, 81, 0.1);
+        }
+
+        .category-option.selected {
+            border-color: rgb(78, 104, 81);
+            background: rgba(78, 104, 81, 0.2);
+        }
+
+        .category-option-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .category-form {
+            display: none;
+        }
+
+        .category-form.show {
+            display: block;
+        }
+
+        .category-form h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .warning-text {
+            color: rgb(184, 58, 45);
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Links Collection <3</h1>
+            <p>Organized links for easy access</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search links or categories...">
+            <button id="addLinkBtn" class="add-link-btn">➕ Add New Link</button>
+            <button id="deleteModeBtn" class="delete-mode-btn">🗑️ Delete Mode</button>
+            <button id="deleteSelectedBtn" class="delete-selected-btn">🗑️ Delete Selected</button>
+            <button id="manageCategoriesBtn" class="manage-categories-btn">📁 Manage Categories</button>
+        </div>
+
+        <div id="loading" class="loading">
+            <h3>Loading your links...</h3>
+        </div>
+
+        <div id="error" class="error" style="display: none;">
+            <h3>Error loading links</h3>
+            <p>Make sure the data/links.txt file exists in the same folder as this HTML file.</p>
+        </div>
+
+        <div class="categories-grid" id="categoriesGrid" style="display: none;">
+            <!-- Categories will be loaded here -->
+        </div>
+
+        <div id="noResults" class="no-results" style="display: none;">
+            <h3>No results found</h3>
+            <p>Try searching for something else</p>
+        </div>
+    </div>
+
+    <!-- Add Link Modal -->
+    <div id="addLinkModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add New Link</h2>
+            <form id="addLinkForm">
+                <div class="form-group">
+                    <label for="linkUrl">URL:</label>
+                    <input type="url" id="linkUrl" required placeholder="https://example.com">
+                </div>
+                <div class="form-group">
+                    <label for="linkTitle">Title (optional):</label>
+                    <input type="text" id="linkTitle" placeholder="Link title">
+                </div>
+                <div class="form-group">
+                    <label for="linkCategory">Category:</label>
+                    <select id="linkCategory" required>
+                        <option value="">Select a category...</option>
+                    </select>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Link</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Link Preview Tooltip -->
+    <div id="linkPreview" class="link-preview">
+        <div class="preview-title"></div>
+        <div class="preview-description"></div>
+    </div>
+
+    <!-- Category Management Modal -->
+    <div id="categoryModal" class="category-modal">
+        <div class="category-modal-content">
+            <span class="close" id="categoryClose">&times;</span>
+            <h2>Manage Categories</h2>
+            
+            <div class="category-options">
+                <div class="category-option" id="addCategoryOption">
+                    <span class="category-option-icon">➕</span>
+                    <strong>Add Category</strong>
+                    <p>Create a new category</p>
+                </div>
+                <div class="category-option" id="deleteCategoryOption">
+                    <span class="category-option-icon">🗑️</span>
+                    <strong>Delete Category</strong>
+                    <p>Remove an existing category</p>
+                </div>
+            </div>
+
+            <!-- Add Category Form -->
+            <div id="addCategoryForm" class="category-form">
+                <h3>Add New Category</h3>
+                <form id="addCategoryFormElement">
+                    <div class="form-group">
+                        <label for="newCategoryName">Category Name:</label>
+                        <input type="text" id="newCategoryName" required placeholder="e.g., Gaming, Work, etc.">
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="btn btn-secondary" id="backToOptions">← Back</button>
+                        <button type="submit" class="btn btn-primary">Add Category</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Delete Category Form -->
+            <div id="deleteCategoryForm" class="category-form">
+                <h3>Delete Category</h3>
+                <form id="deleteCategoryFormElement">
+                    <div class="form-group">
+                        <label for="categoryToDelete">Select Category to Delete:</label>
+                        <select id="categoryToDelete" required>
+                            <option value="">Choose a category...</option>
+                        </select>
+                    </div>
+                    <div class="warning-text">
+                        ⚠️ Warning: This will permanently delete the category and all its links!
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="btn btn-secondary" id="backToOptions2">← Back</button>
+                        <button type="submit" class="btn btn-primary" style="background: rgb(184, 58, 45);">Delete Category</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Category icon mapping
+        const categoryIcons = {
+            'art': 'images/banners_icons/art.png',
+            'minecraft': 'images/banners_icons/minecraft.png',
+            'games': 'images/banners_icons/games.png',
+            'shops': 'images/banners_icons/shops.png',
+            'python': 'images/banners_icons/python.png',
+            'leon king': 'images/banners_icons/leon_king.png',
+            'grumbot': 'images/banners_icons/grumbot.png',
+            'plushy': 'images/banners_icons/plushy.png',
+            'discord server': 'images/banners_icons/discord_server.png',
+            'how to make a website': 'images/banners_icons/how_to_make_website.png',
+            'canessss linksss': 'images/banners_icons/canes.png',
+            'dinnoo!!!!!!!': 'images/banners_icons/art.png' // Using art icon as fallback
+        };
+
+        // Fallback data in case the file can't be loaded
+        const fallbackData = `CANESSSS linksss:
+
+https://fashionablecanes.com/search?q=Shop%20Walking%20Canes%20-%20FashionableCanes.com
+https://fashionablecanes.com/products/brown-swallow-bird-handcarved-cane
+https://fashionablecanes.com/products/fashionstix-majestic-style-adjustab
+
+art:
+https://www.pinterest.com/pin/1196337394255271/
+https://www.pinterest.com/pin/1196337394255271/
+https://www.pinterest.com/pin/311100286778263340/
+https://www.pinterest.com/pin/674977062934452692/
+https://www.pinterest.com/pin/3025924744221856/
+https://www.pinterest.com/pin/378161699980798587/
+https://www.pinterest.com/pin/175570085468829641/
+https://www.pinterest.com/pin/369435975713533712/
+https://www.pinterest.com/pin/6755468185037389/
+
+https://www.youtube.com/watch?v=UE0WzWpUspw
+https://www.youtube.com/watch?v=39Gu8BATKfs
+https://www.youtube.com/watch?v=IHcTmlDUExs
+https://www.youtube.com/watch?v=qGLLYZJMEXc
+https://www.youtube.com/watch?v=rS1xI2xYzHc
+https://www.youtube.com/watch?v=33iNLx5daMk
+https://www.youtube.com/watch?v=-BK1lAFaFUY
+https://www.youtube.com/watch?v=XfIFSqlyMn0
+https://www.youtube.com/watch?v=q2shl645nZA
+https://www.youtube.com/watch?v=sh9tSJX2Hq0
+https://www.youtube.com/watch?v=U5k2T3Vwn6k
+https://www.youtube.com/watch?v=LMzuOkFQmtI
+https://www.youtube.com/watch?v=duSzh2EwNyw
+https://www.youtube.com/watch?v=KZDwp36u8aw
+https://www.youtube.com/watch?v=pIIfwcqqYLQ
+https://www.youtube.com/watch?v=q6nh5sktCnI
+https://www.youtube.com/shorts/o4aCA4k62NY
+https://www.youtube.com/watch?v=hb4EATOAA3o
+https://www.youtube.com/watch?v=yDbpRlte6iI
+https://www.youtube.com/watch?v=RIosb-v6hzk
+https://www.youtube.com/watch?v=Yl5YhiVnO-w
+https://www.youtube.com/watch?v=ywViQ6Ay_2M
+https://www.youtube.com/watch?v=0JqUt6nBAuI
+
+https://www.youtube.com/watch?v=a73CZy2Q6N0
+
+https://www.youtube.com/@emieclat/videos
+https://www.youtube.com/watch?v=d9sHzR5DzFo
+https://www.youtube.com/watch?v=V443aWJcluA
+https://www.youtube.com/watch?v=iOT4JjlGTjw
+https://www.youtube.com/watch?v=2AEhklWy4E0
+https://www.youtube.com/shorts/gksPwPTHBVc
+https://www.youtube.com/watch?v=LuMlqFuB0Js
+
+https://www.youtube.com/@DabidWasTaken
+https://www.youtube.com/watch?v=IB2tqAXEONU
+https://www.youtube.com/@Ashiinkaaa
+https://www.youtube.com/watch?v=8H27u8oy2f4
+
+minecraft:
+https://www.youtube.com/shorts/UZFyJaCa2XQ
+https://www.youtube.com/shorts/zZLQi4sruv8
+https://www.youtube.com/watch?v=zMEyZI1jZuc
+https://www.youtube.com/watch?v=SPXsWGt1zHo
+https://www.youtube.com/shorts/tv-EFj-rIJ0
+https://www.youtube.com/watch?v=-wK7gADHjJ0
+www.youtube.com/watch?v=XObobyaiHgo
+
+games:
+https://www.eneba.com/nl/steam-baldurs-gate-3-digital-deluxe-edition-pc-steam-key-global
+https://www.eneba.com/nl/store/all?drms[]=steam&enb_campaign=Main%20Search&enb_content=search%20dropdown%20-%20input&enb_medium=input&enb_source=https%3A%2F%2Fwww.eneba.com%2Fuplay-avatar-frontiers-of-pandora-pc-ubisoft-connect-key-europe&enb_term=Submit&page=1&regions[]=global&regions[]=row&regions[]=europe&regions[]=emea&regions[]=belgium&text=red%20dead%20redemtion%202
+https://www.eneba.com/rockstar-social-club-red-dead-redemption-2-pc-rockstar-key-global?currency=EUR&af_id=operagxnew&utm_source=operagx&utm_medium=gxcorner&utm_campaign=deals
+https://wooacry.com/product/custom-acrylic-keychain?id=15775
+
+leon king:
+https://www.deviantart.com/audreycosmo13/gallery
+
+shops:
+https://www.jutterceramics.com/shop
+https://wooacry.com/product/custom-acrylic-keychain?id=15775
+https://rog.asus.com/be-nl/content/best-oled-gaming-monitor/?utm_source=operagx&utm_medium=banner
+https://tricktechtoys.com/products/web-shooter
+
+Grumbot:
+https://www.youtube.com/watch?v=ScTk2uK4gBI&t=1797s
+https://www.youtube.com/watch?v=aNO8Q9TayhM
+
+plushy:
+https://www.youtube.com/watch?v=Jsccu1P3vAs
+
+discord server:
+https://www.youtube.com/watch?v=1uZwN6_6YXQ
+
+how to make a website:
+https://www.youtube.com/watch?v=_tWh4cYCTv0
+
+DINNOO!!!!!!!:
+https://www.youtube.com/@PaleoVoid
+
+python:
+https://www.reddit.com/r/learnpython/comments/ywls13/what_are_some_beginner_python_projects_youd/
+https://amankharwal.medium.com/130-python-projects-with-source-code-61f498591bb
+https://amanxai.com/2022/06/29/number-guessing-game-using-python/`;
+
+        function parseLinksData(data) {
+            const categories = {};
+            let currentCategory = "Uncategorized";
+            
+            const lines = data.split('\n');
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (!line) continue;
+                
+                // Check if line is a category header (ends with colon and doesn't start with http)
+                if (line.endsWith(':') && !line.startsWith('http')) {
+                    currentCategory = line.slice(0, -1).trim(); // Remove the colon
+                    categories[currentCategory] = [];
+                } else if (line.startsWith('http') || line.startsWith('www.')) {
+                    // Clean up the URL
+                    let url = line.trim();
+                    if (url.startsWith('www.')) {
+                        url = 'https://' + url;
+                    } else if (!url.startsWith('http')) {
+                        url = 'https://' + url;
+                    }
+                    
+                    // Extract domain for display
+                    const domain = url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+                    const title = domain.replace(/\.(com|org|net)$/, '').replace(/([A-Z])/g, ' $1').trim();
+                    
+                    categories[currentCategory].push({
+                        url: url,
+                        domain: domain,
+                        title: title
+                    });
+                }
+            }
+            
+            return categories;
+        }
+
+        function createCategoryCard(category, links) {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.setAttribute('data-category', category.toLowerCase());
+            
+            const title = document.createElement('div');
+            title.className = 'category-title';
+            
+            // Add category icon
+            const icon = document.createElement('img');
+            icon.className = 'category-icon';
+            icon.src = categoryIcons[category.toLowerCase()] || categoryIcons['art']; // fallback to art icon
+            icon.alt = category;
+            title.appendChild(icon);
+            
+            // Add category name
+            const categoryName = document.createElement('span');
+            categoryName.textContent = category;
+            title.appendChild(categoryName);
+            
+            // Add link count
+            const count = document.createElement('span');
+            count.className = 'category-count';
+            count.textContent = links.length;
+            title.appendChild(count);
+            
+            const linksList = document.createElement('ul');
+            linksList.className = 'links-list';
+            
+            links.forEach((link, index) => {
+                const linkItem = document.createElement('li');
+                linkItem.className = 'link-item';
+                linkItem.setAttribute('data-search', `${link.title.toLowerCase()} ${link.domain.toLowerCase()} ${category.toLowerCase()}`);
+                linkItem.setAttribute('data-url', link.url);
+                linkItem.setAttribute('data-category', category);
+                linkItem.setAttribute('data-index', index);
+                
+                const linkElement = document.createElement('a');
+                linkElement.href = link.url;
+                linkElement.target = '_blank';
+                linkElement.rel = 'noopener noreferrer';
+                linkElement.innerHTML = `
+                    ${link.title}
+                    <div class="link-domain">${link.domain}</div>
+                `;
+                
+                // Add click handler for selection
+                linkItem.addEventListener('click', function(e) {
+                    if (deleteMode) {
+                        e.preventDefault(); // Prevent link navigation in delete mode
+                        toggleLinkSelection(category, index, linkItem);
+                    }
+                });
+                
+                linkItem.appendChild(linkElement);
+                linksList.appendChild(linkItem);
+            });
+            
+            card.appendChild(title);
+            card.appendChild(linksList);
+            return card;
+        }
+
+        function loadLinks() {
+            // Try to load from data/links.txt first
+            fetch('data/links.txt')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('File not found');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    displayLinks(data);
+                })
+                .catch(error => {
+                    console.log('Could not load data/links.txt, using fallback data');
+                    displayLinks(fallbackData);
+                });
+        }
+
+        function displayLinks(data) {
+            try {
+                allCategories = parseLinksData(data);
+                const categoriesGrid = document.getElementById('categoriesGrid');
+                const loading = document.getElementById('loading');
+                const error = document.getElementById('error');
+                
+                // Hide loading and error
+                loading.style.display = 'none';
+                error.style.display = 'none';
+                
+                // Show categories grid
+                categoriesGrid.style.display = 'grid';
+                
+                // Create category cards
+                Object.entries(allCategories).forEach(([category, links]) => {
+                    if (links.length > 0) {
+                        const card = createCategoryCard(category, links);
+                        categoriesGrid.appendChild(card);
+                    }
+                });
+                
+                // Setup search functionality and link previews
+                setupSearch();
+                setupLinkPreviews();
+                
+            } catch (err) {
+                console.error('Error loading links:', err);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        function setupSearch() {
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const categoryCards = document.querySelectorAll('.category-card');
+                const noResults = document.getElementById('noResults');
+                
+                let hasResults = false;
+                
+                categoryCards.forEach(card => {
+                    const links = card.querySelectorAll('.link-item');
+                    let categoryHasResults = false;
+                    
+                    links.forEach(link => {
+                        const searchData = link.getAttribute('data-search');
+                        if (searchData.includes(searchTerm)) {
+                            link.style.display = 'block';
+                            categoryHasResults = true;
+                            hasResults = true;
+                        } else {
+                            link.style.display = 'none';
+                        }
+                    });
+                    
+                    if (categoryHasResults) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                if (hasResults) {
+                    noResults.style.display = 'none';
+                } else {
+                    noResults.style.display = 'block';
+                }
+            });
+        }
+
+        // Global variables
+        let allCategories = {};
+        let linkPreviewTimeout;
+        let deleteMode = false;
+        let selectedLinks = [];
+
+        // Modal functionality
+        const modal = document.getElementById('addLinkModal');
+        const addBtn = document.getElementById('addLinkBtn');
+        const closeBtn = document.querySelector('.close');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const addLinkForm = document.getElementById('addLinkForm');
+
+        addBtn.onclick = function() {
+            modal.style.display = 'block';
+            populateCategorySelect();
+        }
+
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        cancelBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function populateCategorySelect() {
+            const select = document.getElementById('linkCategory');
+            select.innerHTML = '<option value="">Select a category...</option>';
+            
+            Object.keys(allCategories).forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                select.appendChild(option);
+            });
+        }
+
+        // Add new link
+        addLinkForm.onsubmit = function(e) {
+            e.preventDefault();
+            
+            const url = document.getElementById('linkUrl').value;
+            const title = document.getElementById('linkTitle').value;
+            const category = document.getElementById('linkCategory').value;
+            
+            if (!url || !category) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Clean up URL
+            let cleanUrl = url.trim();
+            if (cleanUrl.startsWith('www.')) {
+                cleanUrl = 'https://' + cleanUrl;
+            } else if (!cleanUrl.startsWith('http')) {
+                cleanUrl = 'https://' + cleanUrl;
+            }
+            
+            // Extract domain for display
+            const domain = cleanUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+            const linkTitle = title || domain.replace(/\.(com|org|net)$/, '').replace(/([A-Z])/g, ' $1').trim();
+            
+            // Add to categories
+            if (!allCategories[category]) {
+                allCategories[category] = [];
+            }
+            
+            allCategories[category].push({
+                url: cleanUrl,
+                domain: domain,
+                title: linkTitle
+            });
+            
+            // Refresh display
+            refreshDisplay();
+            
+            // Close modal and reset form
+            modal.style.display = 'none';
+            addLinkForm.reset();
+        }
+
+        // Delete link (legacy function - keeping for compatibility)
+        function deleteLink(category, index) {
+            if (confirm('Are you sure you want to delete this link?')) {
+                allCategories[category].splice(index, 1);
+                refreshDisplay();
+            }
+        }
+
+        function toggleLinkSelection(category, index, element) {
+            const linkId = `${category}-${index}`;
+            const isSelected = selectedLinks.some(link => link.category === category && link.index === index);
+            
+            if (isSelected) {
+                // Remove from selection
+                selectedLinks = selectedLinks.filter(link => !(link.category === category && link.index === index));
+                element.classList.remove('selected');
+            } else {
+                // Add to selection
+                selectedLinks.push({ category, index });
+                element.classList.add('selected');
+            }
+            
+            // Show/hide delete selected button
+            if (selectedLinks.length > 0) {
+                deleteSelectedBtn.classList.add('show');
+                deleteSelectedBtn.textContent = `🗑️ Delete Selected (${selectedLinks.length})`;
+            } else {
+                deleteSelectedBtn.classList.remove('show');
+            }
+        }
+
+        function clearSelection() {
+            selectedLinks = [];
+            document.querySelectorAll('.link-item.selected').forEach(item => {
+                item.classList.remove('selected');
+            });
+            deleteSelectedBtn.classList.remove('show');
+        }
+
+        function exitDeleteMode() {
+            deleteMode = false;
+            deleteModeBtn.classList.remove('active');
+            deleteModeBtn.textContent = '🗑️ Delete Mode';
+            document.body.classList.remove('selection-mode');
+            clearSelection();
+        }
+
+        function refreshDisplay() {
+            const categoriesGrid = document.getElementById('categoriesGrid');
+            categoriesGrid.innerHTML = '';
+            
+            Object.entries(allCategories).forEach(([category, links]) => {
+                if (links.length > 0) {
+                    const card = createCategoryCard(category, links);
+                    categoriesGrid.appendChild(card);
+                }
+            });
+            
+            setupSearch();
+            setupLinkPreviews();
+        }
+
+        // Link preview functionality
+        function setupLinkPreviews() {
+            const linkItems = document.querySelectorAll('.link-item');
+            const preview = document.getElementById('linkPreview');
+            
+            linkItems.forEach(item => {
+                const link = item.querySelector('a');
+                
+                link.addEventListener('mouseenter', function(e) {
+                    const url = this.href;
+                    showLinkPreview(url, e);
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    hideLinkPreview();
+                });
+            });
+        }
+
+        function showLinkPreview(url, event) {
+            const preview = document.getElementById('linkPreview');
+            const title = preview.querySelector('.preview-title');
+            const description = preview.querySelector('.preview-description');
+            
+            // Extract domain for preview
+            const domain = url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+            title.textContent = domain;
+            description.textContent = `Click to visit ${domain}`;
+            
+            // Position the preview
+            preview.style.left = event.pageX + 10 + 'px';
+            preview.style.top = event.pageY - 10 + 'px';
+            
+            // Show with delay
+            clearTimeout(linkPreviewTimeout);
+            linkPreviewTimeout = setTimeout(() => {
+                preview.classList.add('show');
+            }, 500);
+        }
+
+        function hideLinkPreview() {
+            clearTimeout(linkPreviewTimeout);
+            const preview = document.getElementById('linkPreview');
+            preview.classList.remove('show');
+        }
+
+        // Load links when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLinks();
+            setupDeleteMode();
+            setupCategoryManagement();
+        });
+
+        function setupDeleteMode() {
+            const deleteModeBtn = document.getElementById('deleteModeBtn');
+            const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+            deleteModeBtn.onclick = function() {
+                deleteMode = !deleteMode;
+                if (deleteMode) {
+                    deleteModeBtn.classList.add('active');
+                    deleteModeBtn.textContent = '✅ Exit Delete Mode';
+                    document.body.classList.add('selection-mode');
+                } else {
+                    deleteModeBtn.classList.remove('active');
+                    deleteModeBtn.textContent = '🗑️ Delete Mode';
+                    document.body.classList.remove('selection-mode');
+                    clearSelection();
+                }
+            }
+
+            deleteSelectedBtn.onclick = function() {
+                if (selectedLinks.length === 0) {
+                    alert('Please select at least one link to delete');
+                    return;
+                }
+                
+                const count = selectedLinks.length;
+                if (confirm(`Are you sure you want to delete ${count} selected link${count > 1 ? 's' : ''}?`)) {
+                    // Sort by index in reverse order to avoid index shifting issues
+                    selectedLinks.sort((a, b) => b.index - a.index);
+                    
+                    selectedLinks.forEach(link => {
+                        allCategories[link.category].splice(link.index, 1);
+                    });
+                    
+                    clearSelection();
+                    refreshDisplay();
+                    exitDeleteMode();
+                }
+            }
+        }
+
+        function setupCategoryManagement() {
+            const categoryModal = document.getElementById('categoryModal');
+            const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
+            const categoryClose = document.getElementById('categoryClose');
+            const addCategoryOption = document.getElementById('addCategoryOption');
+            const deleteCategoryOption = document.getElementById('deleteCategoryOption');
+            const addCategoryForm = document.getElementById('addCategoryForm');
+            const deleteCategoryForm = document.getElementById('deleteCategoryForm');
+            const backToOptions = document.getElementById('backToOptions');
+            const backToOptions2 = document.getElementById('backToOptions2');
+            const addCategoryFormElement = document.getElementById('addCategoryFormElement');
+            const deleteCategoryFormElement = document.getElementById('deleteCategoryFormElement');
+
+            // Open category management modal
+            manageCategoriesBtn.onclick = function() {
+                categoryModal.style.display = 'block';
+                showCategoryOptions();
+            }
+
+            // Close modal
+            categoryClose.onclick = function() {
+                categoryModal.style.display = 'none';
+                resetCategoryModal();
+            }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+                if (event.target == categoryModal) {
+                    categoryModal.style.display = 'none';
+                    resetCategoryModal();
+                }
+            }
+
+            // Add category option
+            addCategoryOption.onclick = function() {
+                showAddCategoryForm();
+            }
+
+            // Delete category option
+            deleteCategoryOption.onclick = function() {
+                showDeleteCategoryForm();
+            }
+
+            // Back buttons
+            backToOptions.onclick = function() {
+                showCategoryOptions();
+            }
+
+            backToOptions2.onclick = function() {
+                showCategoryOptions();
+            }
+
+            // Add category form submission
+            addCategoryFormElement.onsubmit = function(e) {
+                e.preventDefault();
+                
+                const categoryName = document.getElementById('newCategoryName').value.trim();
+                
+                if (!categoryName) {
+                    alert('Please enter a category name');
+                    return;
+                }
+                
+                if (allCategories[categoryName]) {
+                    alert('A category with this name already exists');
+                    return;
+                }
+                
+                // Add new category
+                allCategories[categoryName] = [];
+                
+                // Refresh display
+                refreshDisplay();
+                
+                // Close modal and reset
+                categoryModal.style.display = 'none';
+                resetCategoryModal();
+                
+                alert(`Category "${categoryName}" has been created successfully!`);
+            }
+
+            // Delete category form submission
+            deleteCategoryFormElement.onsubmit = function(e) {
+                e.preventDefault();
+                
+                const categoryToDelete = document.getElementById('categoryToDelete').value;
+                
+                if (!categoryToDelete) {
+                    alert('Please select a category to delete');
+                    return;
+                }
+                
+                const linkCount = allCategories[categoryToDelete].length;
+                
+                if (confirm(`Are you sure you want to delete the category "${categoryToDelete}" and all ${linkCount} of its links? This action cannot be undone.`)) {
+                    // Delete the category
+                    delete allCategories[categoryToDelete];
+                    
+                    // Refresh display
+                    refreshDisplay();
+                    
+                    // Close modal and reset
+                    categoryModal.style.display = 'none';
+                    resetCategoryModal();
+                    
+                    alert(`Category "${categoryToDelete}" has been deleted successfully!`);
+                }
+            }
+        }
+
+        function showCategoryOptions() {
+            document.querySelector('.category-options').style.display = 'flex';
+            document.getElementById('addCategoryForm').classList.remove('show');
+            document.getElementById('deleteCategoryForm').classList.remove('show');
+        }
+
+        function showAddCategoryForm() {
+            document.querySelector('.category-options').style.display = 'none';
+            document.getElementById('addCategoryForm').classList.add('show');
+            document.getElementById('deleteCategoryForm').classList.remove('show');
+        }
+
+        function showDeleteCategoryForm() {
+            document.querySelector('.category-options').style.display = 'none';
+            document.getElementById('addCategoryForm').classList.remove('show');
+            document.getElementById('deleteCategoryForm').classList.add('show');
+            
+            // Populate category dropdown
+            const select = document.getElementById('categoryToDelete');
+            select.innerHTML = '<option value="">Choose a category...</option>';
+            
+            Object.keys(allCategories).forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = `${category} (${allCategories[category].length} links)`;
+                select.appendChild(option);
+            });
+        }
+
+        function resetCategoryModal() {
+            document.getElementById('newCategoryName').value = '';
+            document.getElementById('categoryToDelete').value = '';
+            showCategoryOptions();
+        }
+    </script>
+</body>
+</html>
